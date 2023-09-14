@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "auth-challenge-poc"
+s3_bucket = "capillary-test-distribution"
+s3_prefix = "auth-challenge-poc"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+image_repositories = []
+disable_rollback = true

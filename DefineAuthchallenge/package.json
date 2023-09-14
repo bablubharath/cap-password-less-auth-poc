@@ -1,0 +1,20 @@
+{
+  "name": "signup",
+  "version": "1.0.0",
+  "description": "Signup API with OTP trigger",
+  "main": "userSignup.js",
+  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.1277.0",
+    "babel-jest": "^29.3.1",
+    "jest": "^29.3.1"
+  },
+  "scripts": {
+    "test": "jest --config=jest.config.test.mjs"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.20.2"
+  }
+}

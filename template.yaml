@@ -1,0 +1,169 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: CreateAuthChallenge Serverless Function
+Globals:
+  Function:
+    Timeout: 365
+    MemorySize: 512
+    Runtime: nodejs18.x
+    Architectures:
+      - x86_64
+    Layers:
+      - !Ref SharedLayer
+Resources:
+  CreateAuthChallengeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CreateAuthChallenge/
+      FunctionName: CreateAuthChallengeFunction
+      Description: Lambda function to create an authentication challenge
+      Handler: createAuthChallenge.handler
+      Events:
+        ApiGatewayEvent:
+          Type: Api
+          Properties:
+            Path: /create-auth-challenge
+            Method: POST
+      Policies:
+          - Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
+  DefineAuthChallengeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DefineAuthchallenge/
+      FunctionName: DefineAuthChallengeFunction
+      Description: Lambda function to define an authentication challenge
+      Handler: defineAuthChallenge.handler
+      Events:
+        ApiGatewayEvent:
+          Type: Api
+          Properties:
+            Path: /define-auth-challenge
+            Method: POST
+      Policies:
+          - Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
+  VerifyAuthChallengeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: VerifyAuthchallenge/
+      FunctionName: VerifyAuthChallengeFunction
+      Description: Lambda function to verify an authentication challenge
+      Handler: verifyAuthChallenge.handler
+      Events:
+        ApiGatewayEvent:
+          Type: Api
+          Properties:
+            Path: /verify-auth-challenge
+            Method: POST
+      Policies:
+          - Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+  AuthFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: auth-module/
+      Handler: authModule.AuthLambdaHandler
+
+      Events:
+        ApiGatewaySignupEvent:
+          Type: Api
+          Properties:
+            Path: /signup
+            Method: POST
+        ApiGatewaySigninEvent:
+          Type: Api
+          Properties:
+            Path: /signin
+            Method: POST
+      Policies:
+          - Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+      #   SNSevent:
+      #     Type: SNS
+      #     Properties:
+      #       Topic: !Ref CustomerOtpSNSTopic
+      # Policies:
+      #   - DynamoDBCrudPolicy:
+      #       TableName: !Sub 'user-pre-signup-detail-${Env}'
+      #   - DynamoDBReconfigurePolicy:
+      #       TableName: !Sub 'user-pre-signup-detail-${Env}'
+      #   - DynamoDBCrudPolicy:
+      #       TableName: !Sub 'user-detail-${Env}'
+      #   - DynamoDBReconfigurePolicy:
+      #       TableName: !Sub 'user-detail-${Env}'
+
+  SharedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: SharedLayer-auth-poc
+      Description: Shared NPM package.
+      ContentUri: 'layer/'
+      CompatibleRuntimes:
+        - nodejs18.x
+  
+  TestCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub 'test-userpool'
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+      LambdaConfig:
+        DefineAuthChallenge: !GetAtt DefineAuthChallengeFunction.Arn
+        CreateAuthChallenge: !GetAtt CreateAuthChallengeFunction.Arn
+        VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeFunction.Arn
+      AutoVerifiedAttributes: []
+      Schema:
+        - AttributeDataType: String
+          Name: phone_number
+  TestCognitoUserPoolCustomerGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref TestCognitoUserPool
+      Precedence: 0
+      GroupName: 'customer'
+  TestCognitoUserPoolAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref TestCognitoUserPool
+      Precedence: 1
+      GroupName: 'admin'
+  TestCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref TestCognitoUserPool
+      ClientName: !Sub 'test-userpool-client'
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+Outputs:
+  CreateAuthChallengeFunction:
+    Description: Lambda Function ARN
+    Value: !GetAtt CreateAuthChallengeFunction.Arn
