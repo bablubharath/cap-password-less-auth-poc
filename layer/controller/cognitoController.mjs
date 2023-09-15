@@ -14,7 +14,7 @@ class CognitoController {
   signUpUser = async (phoneNumber, password) => {
     console.log("Entered");
     const signUpParams = {
-      ClientId: "n4p4i5mfkuro0kd1es3aupmjp",
+      ClientId: "3khuo6rb9fbgb10437citt4uro",
       Username: phoneNumber,
       Password: password,
       UserAttributes: [
@@ -48,8 +48,8 @@ class CognitoController {
   signInUser = async (mobileNumber) => {
     const signInParams = {
       AuthFlow: "CUSTOM_AUTH",
-      ClientId: "n4p4i5mfkuro0kd1es3aupmjp",
-      UserPoolId: "us-east-1_BX3K4WE2a",
+      ClientId: "3khuo6rb9fbgb10437citt4uro",
+      UserPoolId: "us-east-1_8jKUxN1WC",
       AuthParameters: {
         USERNAME: mobileNumber,
         CUSTOM_CHALLENGE_PARAM: "custom_challenge_value",
@@ -68,7 +68,7 @@ class CognitoController {
         status: false,
         data: {
           message: error?.message ? error.message : error.toString(),
-          errorType: "sign_up_error",
+          errorType: "sign_in_error",
         },
       };
     }

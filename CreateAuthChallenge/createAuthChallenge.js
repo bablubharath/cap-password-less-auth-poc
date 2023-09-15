@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
     await cognito
       .adminCreateUserChallenge({
         ChallengeName: "CUSTOM_CHALLENGE", // Adjust based on your challenge type
-        UserPoolId: "us-east-1_BX3K4WE2a",
+        UserPoolId: "us-east-1_8jKUxN1WC",
         Username: username,
         ChallengeResponses: challengeParams,
       })

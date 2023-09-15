@@ -24,7 +24,7 @@ exports.handler = async (event, context) => {
     // Define the authentication challenge using the Cognito API
     await cognito
       .adminSetUserSettings({
-        UserPoolId: "us-east-1_BX3K4WE2a",
+        UserPoolId: "us-east-1_8jKUxN1WC",
         Username: username,
         MFAOptions: [
           {

@@ -19,7 +19,7 @@ exports.handler = async (event, context) => {
     // Verify the authentication challenge response using the Cognito API
     await cognito.respondToAuthChallenge({
       ChallengeName: challengeName,
-      ClientId: 'n4p4i5mfkuro0kd1es3aupmjp', // Specify the Cognito User Pool Client ID
+      ClientId: '3khuo6rb9fbgb10437citt4uro', // Specify the Cognito User Pool Client ID
       ChallengeResponses: {
         USERNAME: username,
         SECRET_HASH: 'my-secret-poc-hash', // Optional if using a client secret
