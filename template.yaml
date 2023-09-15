@@ -26,6 +26,7 @@ Resources:
       FunctionName: CreateAuthChallengeFunction
       Description: Lambda function to create an authentication challenge
       Handler: createAuthChallenge.handler
+      Role: !GetAtt CognitoRoleForTriggers.Arn
       Events:
         CreateAuth:
           Type: Api
@@ -60,6 +61,7 @@ Resources:
       FunctionName: DefineAuthChallengeFunction
       Description: Lambda function to define an authentication challenge
       Handler: defineAuthChallenge.handler
+      Role: !GetAtt CognitoRoleForTriggers.Arn
       Events:
         DefineAuth:
           Type: Api
@@ -94,6 +96,7 @@ Resources:
       FunctionName: VerifyAuthChallengeFunction
       Description: Lambda function to verify an authentication challenge
       Handler: verifyAuthChallenge.handler
+      Role: !GetAtt CognitoRoleForTriggers.Arn
       Events:
         VerifyAuthCh:
           Type: Api
@@ -126,7 +129,7 @@ Resources:
     Properties:
       CodeUri: auth-module/
       Handler: authModule.AuthLambdaHandler
-
+      Role: !GetAtt CognitoRoleForTriggers.Arn
       Events:
         SignupEvent:
           Type: Api
@@ -182,7 +185,29 @@ Resources:
       ContentUri: 'layer/'
       CompatibleRuntimes:
         - nodejs18.x
-  
+
+  CognitoRoleForTriggers:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cognito-idp.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CognitoTriggersPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
   TestCognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
